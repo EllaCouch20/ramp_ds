@@ -1,0 +1,10 @@
+[package]
+name = "ramp_ds"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.15.0"
+bevy_state = "0.15.0"
+bevy_ui = "0.15.0"
+bevy_simple_text_input = "0.10.0"
