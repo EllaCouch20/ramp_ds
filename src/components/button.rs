@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 
 use crate::Theme;
-use crate::theme::color::ButtonColor;
 
 #[derive(Copy, Clone, Component, Debug)]
 pub enum ButtonStyle {
