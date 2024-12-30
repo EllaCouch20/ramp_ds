@@ -1,20 +1,19 @@
 use bevy::prelude::*;
-
 use crate::Theme;
 
-#[derive(Copy, Clone, Component, Debug)]
+#[derive(Hash, Eq, PartialEq, Debug, Clone, Copy, Component)]
+pub enum ButtonState {
+    Default,
+    Disabled,
+    Hover,
+    Selected,
+}
+
+#[derive(Hash, Eq, PartialEq, Debug, Clone, Copy, Component)]
 pub enum ButtonStyle {
     Primary,
     Secondary,
     Ghost,
-}
-
-#[derive(Copy, Clone, Component, PartialEq)]
-pub enum InteractiveState {
-    Default,
-    Selected,
-    Hover,
-    Disabled,
 }
 
 #[derive(PartialEq)]
@@ -38,9 +37,10 @@ impl CustomButton {
         tag: T,
         theme: &Res<Theme>
     ) {
-        let status = InteractiveState::Default;
+        let status = ButtonState::Default;
 
-        let colors: ButtonColor = button_color(&theme, &self.style, status);
+        let colors = theme.colors.button.colors_from(self.style, ButtonState::Default);
+
         let font = theme.fonts.style.label.clone();
 
         let (button_width, flex_grow) = match self.width_style {
@@ -101,39 +101,39 @@ impl CustomButton {
             ));     
         });
     }
+}
 
-    pub fn button_system(
-        theme: &Res<Theme>,
-        mut interaction_query: Query<
-            (
-                &Interaction,
-                &mut BackgroundColor,
-                &mut BorderColor,
-                Option<&ButtonStyle>,
-                &InteractiveState,
-            ),
-            (Changed<Interaction>, With<Button>),
-        >,
-    ) {
-        for (interaction, mut color, mut border_color, button_style, state) in &mut interaction_query {
-            if *state != InteractiveState::Disabled && *state != InteractiveState::Selected {
-                if let Some(button_style) = button_style {
-                    match *interaction {
-                        Interaction::Hovered => {
-                            let colors: ButtonColor = button_color(&theme, button_style, InteractiveState::Hover);
-                            *color = colors.background.into();
-                            border_color.0 = colors.outline;
-                        }
-                        Interaction::None => {
-                            let colors: ButtonColor = button_color(&theme, button_style, InteractiveState::Default);
-                            *color = colors.background.into();
-                            border_color.0 = colors.outline;
-                        }
-                        Interaction::Pressed => {
-                            let colors: ButtonColor = button_color(&theme, button_style, InteractiveState::Selected);
-                            *color = colors.background.into();
-                            border_color.0 = colors.outline;
-                        }
+pub fn button_system(
+    theme: Res<Theme>,
+    mut interaction_query: Query<
+        (
+            &Interaction,
+            &mut BackgroundColor,
+            &mut BorderColor,
+            Option<&ButtonStyle>,
+            &ButtonState,
+        ),
+        (Changed<Interaction>, With<Button>),
+    >,
+) {
+    for (interaction, mut color, mut border_color, button_style, state) in &mut interaction_query {
+        if *state != ButtonState::Disabled && *state != ButtonState::Selected {
+            if let Some(button_style) = button_style {
+                match *interaction {
+                    Interaction::Hovered => {
+                        let colors = theme.colors.button.colors_from(*button_style, ButtonState::Hover);
+                        *color = colors.background.into();
+                        border_color.0 = colors.outline;
+                    }
+                    Interaction::None => {
+                        let colors = theme.colors.button.colors_from(*button_style, ButtonState::Default);
+                        *color = colors.background.into();
+                        border_color.0 = colors.outline;
+                    }
+                    Interaction::Pressed => {
+                        let colors = theme.colors.button.colors_from(*button_style, ButtonState::Selected);
+                        *color = colors.background.into();
+                        border_color.0 = colors.outline;
                     }
                 }
             }
@@ -160,38 +160,3 @@ pub fn context_button(label: &str, icon: ImageNode) -> CustomButton {
         alignment: JustifyContent::Start,
     }
 }
-
-fn button_color(
-    theme: &Res<Theme>,
-    style: &ButtonStyle,
-    state: InteractiveState,
-) -> ButtonColor {
-    match style {
-        ButtonStyle::Primary => {
-            match state {
-                InteractiveState::Default => theme.colors.button.primary_default,
-                InteractiveState::Disabled => theme.colors.button.primary_disabled,
-                InteractiveState::Hover => theme.colors.button.primary_hover,
-                InteractiveState::Selected => theme.colors.button.primary_selected,
-            }
-        }
-        ButtonStyle::Secondary => {
-            match state {
-                InteractiveState::Default => theme.colors.button.secondary_default,
-                InteractiveState::Disabled => theme.colors.button.secondary_disabled,
-                InteractiveState::Hover => theme.colors.button.secondary_hover,
-                InteractiveState::Selected => theme.colors.button.secondary_selected,
-            }
-        }
-        ButtonStyle::Ghost => {
-            match state {
-                InteractiveState::Default => theme.colors.button.ghost_default,
-                InteractiveState::Disabled => theme.colors.button.ghost_disabled,
-                InteractiveState::Hover => theme.colors.button.ghost_hover,
-                InteractiveState::Selected => theme.colors.button.ghost_selected,
-            }
-        }
-    }
-}
-
-// ==== Handle Button Interactions ==== //

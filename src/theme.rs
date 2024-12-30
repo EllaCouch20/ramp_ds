@@ -1,8 +1,8 @@
 use bevy::prelude::*;
-use bevy::asset::{LoadedFolder, AssetPath};
+use bevy::asset::LoadedFolder;
 
+pub mod color;
 mod icons;
-mod color;
 mod fonts;
 
 #[derive(Resource)]
@@ -18,14 +18,16 @@ impl Theme {
         assets: Res<Assets<LoadedFolder>>,
         theme_template: Res<ThemeTemplate>) -> Self {
         Theme {
-            colors: color::ColorResources::default(),
-            fonts: fonts::FontResources::new(&asset_server),
-            icons: icons::IconResources::new(&asset_server, assets)
+            colors: theme_template.colors.clone(),
+            fonts: fonts::FontResources::new(asset_server, theme_template.fonts.clone(), theme_template.font_sizes),
+            icons: icons::IconResources::new(asset_server, assets)
         }
     }
 }
 
-#[derive(Resource, Clone)]
+#[derive(Resource, Default, Clone)]
 pub struct ThemeTemplate{
-
+    colors: color::ColorResources,
+    fonts: fonts::Fonts,
+    font_sizes: fonts::FontSizes,
 }

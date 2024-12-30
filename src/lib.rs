@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy::asset::{LoadedFolder, AssetPath};
+use bevy::asset::LoadedFolder;
 
 pub mod components;
 pub mod theme;
@@ -20,6 +20,7 @@ impl Plugin for RampDSPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(self.theme_template.clone());
         app.add_systems(PreStartup, pre_startup);
+        app.add_systems(Update, components::button::button_system);
     }
 }
 

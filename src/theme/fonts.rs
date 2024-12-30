@@ -1,6 +1,5 @@
 #![allow(unused)]
 use bevy::prelude::*;
-use bevy_ui::prelude::*;
 
 pub struct FontResources {
     pub style: Style,
@@ -8,13 +7,13 @@ pub struct FontResources {
 }
 
 impl FontResources {
-    pub fn new(asset_server: &Res<AssetServer>) -> Self {
+    pub fn new(asset_server: &Res<AssetServer>, files: Fonts, size: FontSizes) -> Self {
         FontResources{
-            style: Style::new(asset_server),
-            size: FontSizes::default()
+            style: Style::new(asset_server, files),
+            size,
         }
     }
-} 
+}
 
 #[derive(Resource)]
 pub struct Style {
@@ -24,18 +23,16 @@ pub struct Style {
 }
 
 impl Style {
-    pub fn new(asset_server: &Res<AssetServer>) -> Style {
-        let outfit_bold = asset_server.load("fonts/Outfit-Bold.ttf");
-        let outfit_regular = asset_server.load("fonts/Outfit-Regular.ttf");
+    pub fn new(asset_server: &Res<AssetServer>, files: Fonts) -> Style {
         Style {
-            heading: outfit_bold.clone(),
-            text: outfit_regular.clone(),
-            label: outfit_bold.clone(),
+            heading: asset_server.load(format!("fonts/{}", files.heading)),
+            text: asset_server.load(format!("fonts/{}", files.text)),
+            label: asset_server.load(format!("fonts/{}", files.label)),
         }
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Clone, Copy)]
 pub struct FontSizes {
     pub title: f32,
     pub h1: f32,
@@ -66,6 +63,33 @@ impl Default for FontSizes {
             md: 16.0,
             sm: 14.0,
             xs: 12.0,
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct Fonts {
+    heading: String,
+    text: String,
+    label: String,
+}
+
+impl Fonts {
+    pub fn new(heading: &str, text: &str, label: &str) -> Fonts {
+        Fonts{
+            heading: heading.to_string(),
+            text: text.to_string(),
+            label: label.to_string(),
+        }
+    }
+}
+
+impl Default for Fonts {
+    fn default() -> Self {
+        Fonts {
+            heading: "Outfit_Bold.ttf".to_string(),
+            text: "Outfit_Regular.ttf".to_string(),
+            label: "Outfit_Bold.ttf".to_string(),
         }
     }
 }
