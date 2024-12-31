@@ -3,17 +3,34 @@ use bevy::prelude::*;
 use bevy::asset::LoadedFolder;
 
 pub struct IconResources {
-    pub icons: BTreeMap<String, ImageNode>
+    pub icons: BTreeMap<String, Handle<Image>>
 }
 
 impl IconResources {
-    pub fn new(asset_server: &Res<AssetServer>, assets: Res<Assets<LoadedFolder>>) -> Self {
-        let handle: Handle<LoadedFolder> = asset_server.load_folder("assets/icons");
-        let handles: Vec<Handle<Image>> = assets.get(handle.id()).unwrap().handles.clone().into_iter().flat_map(|h| h.try_typed::<Image>().ok()).collect();
-        IconResources{icons: BTreeMap::from_iter(handles.into_iter().flat_map(|h| h.path().map(|p| p.to_string()).map(|p| (p, ImageNode::new(h)))))}
+    pub fn new(asset_server: Res<AssetServer>, icons: Vec<String>) -> Self {
+       IconResources{icons: BTreeMap::from_iter(icons.into_iter().map(|p| (p.clone(), asset_server.load(&format!("icons/{p}.png")))))}
     }
 
-    pub fn get(&self, name: &str) -> Option<ImageNode> {
-        self.icons.get(&format!("{}.png", name)).cloned()
+    pub fn get(&self, name: &str) -> ImageNode {
+        ImageNode::new(self.icons.get(name).cloned().unwrap())
+    }
+}
+
+#[derive(Clone)]
+pub struct Icons {
+    pub vec: Vec<String>
+}
+
+impl Default for Icons {
+    fn default() -> Self {
+        Icons {
+            vec: vec![
+                "file".to_string(),
+                "folder".to_string(),
+                "delete".to_string(),
+                "save".to_string(),
+                "exit".to_string()
+            ]
+        }
     }
 }

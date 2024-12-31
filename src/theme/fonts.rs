@@ -87,9 +87,9 @@ impl Fonts {
 impl Default for Fonts {
     fn default() -> Self {
         Fonts {
-            heading: "Outfit_Bold.ttf".to_string(),
-            text: "Outfit_Regular.ttf".to_string(),
-            label: "Outfit_Bold.ttf".to_string(),
+            heading: "Outfit-Bold.ttf".to_string(),
+            text: "Outfit-Regular.ttf".to_string(),
+            label: "Outfit-Bold.ttf".to_string(),
         }
     }
 }

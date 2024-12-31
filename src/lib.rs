@@ -27,8 +27,7 @@ impl Plugin for RampDSPlugin {
 fn pre_startup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    assets: Res<Assets<LoadedFolder>>,
     theme_template: Res<ThemeTemplate>
 ) {
-    commands.insert_resource(Theme::new(&asset_server, assets, theme_template));
+    commands.insert_resource(Theme::new(asset_server, theme_template));
 }
