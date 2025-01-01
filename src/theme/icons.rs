@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 use bevy::prelude::*;
-use bevy::asset::LoadedFolder;
 
 pub struct IconResources {
     pub icons: BTreeMap<String, Handle<Image>>
@@ -8,7 +7,7 @@ pub struct IconResources {
 
 impl IconResources {
     pub fn new(asset_server: Res<AssetServer>, icons: Vec<String>) -> Self {
-       IconResources{icons: BTreeMap::from_iter(icons.into_iter().map(|p| (p.clone(), asset_server.load(&format!("icons/{p}.png")))))}
+       IconResources{icons: BTreeMap::from_iter(icons.into_iter().map(|p| (p.clone(), asset_server.load(format!("icons/{p}.png")))))}
     }
 
     pub fn get(&self, name: &str) -> ImageNode {

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
-use bevy::asset::LoadedFolder;
 
 pub mod components;
+pub mod layout;
 pub mod theme;
 
 use theme::{ThemeTemplate, Theme};

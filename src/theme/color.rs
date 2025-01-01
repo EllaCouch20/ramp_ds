@@ -10,8 +10,6 @@ pub struct ColorResources {
     pub outline: OutlineColor, 
     pub status: StatusColor,
     pub text: TextColor,
-
-    pub icon: IconColor,
     pub button: ButtonColors,
 }
 
@@ -22,7 +20,6 @@ impl Default for ColorResources {
             outline: OutlineColor::default(),
             status: StatusColor::default(),
             text: TextColor::default(),
-            icon: IconColor::default(),
             button: ButtonColors::new(
                 ButtonSchemes::default(),
             ),
@@ -36,7 +33,6 @@ impl ColorResources {
         outline: OutlineColor,
         status: StatusColor,
         text: TextColor,
-        icon: IconColor,
         button: ButtonColors,
     ) -> Self {
         ColorResources {
@@ -44,7 +40,6 @@ impl ColorResources {
             outline,
             status,
             text,
-            icon,
             button,
         }
     }
@@ -115,29 +110,6 @@ impl Default for StatusColor {
         }
     }
 }
-
-/* -------- ICONS -------- */
-
-#[derive(Copy, Clone)]
-pub struct IconColor {
-    pub default: Color,
-    pub disabled: Color,
-    pub hover: Color,
-    pub selected: Color,
-}
-
-impl Default for IconColor {
-    fn default() -> Self {
-        IconColor{
-            default: hex("ffffff"),
-            disabled: hex("585250"),
-            hover: hex("c7c4c1"),
-            selected: hex("ffffff"),
-        }
-    }
-}
-
-/* -------- INTERACTIVE -------- */
 
 #[derive(Copy, Clone)]
 pub struct ButtonColorScheme {
@@ -242,19 +214,11 @@ impl ButtonColors {
     fn new(schemes: ButtonSchemes) -> Self {
         let mut color_map = HashMap::new();
 
-        color_map.insert(
-            (ButtonState::Default, ButtonStyle::Primary),
-            schemes.primary_default,
-        );
+        color_map.insert((ButtonState::Default, ButtonStyle::Primary), schemes.primary_default);
 
-        color_map.insert(
-            (ButtonState::Disabled, ButtonStyle::Primary),
-            schemes.primary_disabled,
-        );
+        color_map.insert((ButtonState::Disabled, ButtonStyle::Primary), schemes.primary_disabled);
 
-        color_map.insert(
-            (ButtonState::Hover, ButtonStyle::Primary),
-            schemes.primary_hover,
+        color_map.insert((ButtonState::Hover, ButtonStyle::Primary), schemes.primary_hover,
         );
 
         color_map.insert(
@@ -262,20 +226,11 @@ impl ButtonColors {
             schemes.primary_selected,
         );
 
-        color_map.insert(
-            (ButtonState::Default, ButtonStyle::Secondary),
-            schemes.secondary_default,
-        );
+        color_map.insert((ButtonState::Default, ButtonStyle::Secondary), schemes.secondary_default);
 
-        color_map.insert(
-            (ButtonState::Disabled, ButtonStyle::Secondary),
-            schemes.secondary_disabled,
-        );
+        color_map.insert((ButtonState::Disabled, ButtonStyle::Secondary), schemes.secondary_disabled);
 
-        color_map.insert(
-            (ButtonState::Hover, ButtonStyle::Secondary),
-            schemes.secondary_hover,
-        );
+        color_map.insert((ButtonState::Hover, ButtonStyle::Secondary), schemes.secondary_hover);
 
         color_map.insert(
             (ButtonState::Selected, ButtonStyle::Secondary),

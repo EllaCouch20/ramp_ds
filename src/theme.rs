@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy::asset::LoadedFolder;
 
 pub mod color;
 mod icons;
@@ -30,4 +29,11 @@ pub struct ThemeTemplate{
     fonts: fonts::Fonts,
     font_sizes: fonts::FontSizes,
     icons: icons::Icons,
+}
+
+#[derive(Component, Copy, Clone)]
+pub enum NavigateTo {
+    Bitcoin,
+    Messages,
+    Profile
 }

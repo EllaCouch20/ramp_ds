@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+
+use crate::layout::utils::Size;
 use crate::Theme;
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy, Component)]
@@ -24,22 +26,24 @@ pub enum ButtonWidth {
 
 pub struct CustomButton{
     label: String,
-    icon: ImageNode,
+    icon: Option<String>,
+    photo: Option<String>,
     style: ButtonStyle,
+    state: ButtonState,
+    size: Size,
     width_style: ButtonWidth,
     alignment: JustifyContent,
 }
 
 impl CustomButton {
     pub fn spawn_under<T: Bundle>(
-        self,
+        &self,
         parent: &mut ChildBuilder,
         tag: T,
         theme: &Res<Theme>
     ) {
-        let status = ButtonState::Default;
 
-        let colors = theme.colors.button.colors_from(self.style, ButtonState::Default);
+        let colors = theme.colors.button.colors_from(self.style, self.state);
 
         let font = theme.fonts.style.label.clone();
 
@@ -48,7 +52,10 @@ impl CustomButton {
             ButtonWidth::Hug => (Val::Auto, 0.0),
         };
 
-        let (height, padding, icon_size, icon_pad, font_size) = (32.0, 12.0, 20.0, 4.0, theme.fonts.size.md);
+        let (height, padding, icon_size, icon_pad, font_size) = match self.size {
+            Size::Large => (48.0, 24.0, 24.0, 12.0, theme.fonts.size.lg),
+            Size::Medium => (32.0, 12.0, 16.0, 4.0, theme.fonts.size.md),
+        };
 
         parent.spawn((
             Button,
@@ -72,26 +79,34 @@ impl CustomButton {
             BorderRadius::MAX,
             BackgroundColor(colors.background),
             self.style,
-            status,
+            self.state,
             tag,
         )).with_children(|button| {
 
             // === Spawn Icon === //
 
-            button.spawn((
-                self.icon,
-                Node {
-                    height: Val::Px(icon_size),
-                    width: Val::Px(icon_size),
-                    margin: UiRect::right(Val::Px(icon_pad)), 
-                    ..default()
-                },
-            ));
+            if let Some(icon) = &self.icon {
+                button.spawn((
+                    theme.icons.get(icon),
+                    Node {
+                        height: Val::Px(icon_size),
+                        width: Val::Px(icon_size),
+                        margin: UiRect::right(Val::Px(icon_pad)), 
+                        ..default()
+                    },
+                ));
+            }
+
+            // if let Some(photo) = self.photo.clone() {
+            //     button.spawn(Node::default()).with_children(|parent| {
+            //         profile_photo(parent, theme, asset_server, 32.0, &photo);
+            //     });
+            // }
 
             // === Spawn Label === //
 
             button.spawn((
-                Text::new(self.label),
+                Text::new(self.label.clone()),
                 TextFont {
                     font,
                     font_size,
@@ -141,22 +156,54 @@ pub fn button_system(
     }
 }
 
-pub fn default_button(label: &str, icon: ImageNode) -> CustomButton {
+pub fn secondary_default(label: &str, icon: &str) -> CustomButton {
     CustomButton {
         label: label.to_string(),
-        icon,
+        icon: Some(icon.to_string()),
+        photo: None,
         style: ButtonStyle::Secondary,
+        state: ButtonState::Default,
+        size: Size::Medium,
         width_style: ButtonWidth::Hug,
         alignment: JustifyContent::Center,
     }
 }
 
-pub fn context_button(label: &str, icon: ImageNode) -> CustomButton {
+pub fn context_button(label: &str, icon: &str) -> CustomButton {
     CustomButton {
         label: label.to_string(),
-        icon,
+        icon: Some(icon.to_string()),
+        photo: None,
         style: ButtonStyle::Ghost,
+        state: ButtonState::Default,
+        size: Size::Medium,
         width_style: ButtonWidth::Expand,
         alignment: JustifyContent::Start,
     }
+}
+
+pub fn nav_button(label: String, icon: String, state: ButtonState) -> CustomButton {
+    CustomButton {
+        label,
+        icon: Some(icon),
+        photo: None,
+        style: ButtonStyle::Ghost,
+        state,
+        size: Size::Large,
+        width_style: ButtonWidth::Expand,
+        alignment: JustifyContent::Start,
+    } 
+}
+
+pub fn nav_profile(name: &str, state: ButtonState) -> CustomButton {
+    CustomButton {
+        label: name.to_string(),
+        icon: None,
+        photo: Some("profile_picture".to_string()),
+        style: ButtonStyle::Ghost,
+        state,
+        size: Size::Large,
+        width_style: ButtonWidth::Expand,
+        alignment: JustifyContent::Start,
+    } 
 }
