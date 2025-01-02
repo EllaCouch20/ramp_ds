@@ -9,7 +9,7 @@ pub struct Content {
 }
 
 impl Component for Content {
-    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, theme: &Res<Theme>) {
         parent.spawn(Node {
             justify_content: self.alignment,
             width: Val::Percent(100.0),
@@ -21,7 +21,7 @@ impl Component for Content {
             padding: UiRect::all(Val::Px(24.0)),
             ..default()
         }).with_children(|parent|{
-            self.children.iter().map(|component| {
+            self.children.into_iter().map(|component| {
                 component.spawn(parent, theme);
             });
         });

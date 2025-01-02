@@ -82,17 +82,17 @@ impl Component for Button {
             self.state,
             self.on_press.clone()
         )).with_children(|parent| {
-            // if let Some(icon) = &self.icon {
-            //     parent.spawn((
-            //         theme.icons.get(icon),
-            //         Node {
-            //             height: Val::Px(icon_size),
-            //             width: Val::Px(icon_size),
-            //             margin: UiRect::right(Val::Px(icon_pad)),
-            //             ..default()
-            //         },
-            //     ));
-            // }
+            if let Some(icon) = &self.icon {
+                parent.spawn((
+                    theme.icons.get(icon),
+                    Node {
+                        height: Val::Px(icon_size),
+                        width: Val::Px(icon_size),
+                        margin: UiRect::right(Val::Px(icon_pad)),
+                        ..default()
+                    },
+                ));
+            }
 
             // if let Some(photo) = self.photo.clone() {
             //     button.spawn(Node::default()).with_children(|parent| {
@@ -153,46 +153,46 @@ impl Button {
         }
     }
 
-//     pub fn context(label: &str, icon: &str) -> Self {
-//         Button {
-//             label: label.to_string(),
-//             icon: Some(icon.to_string()),
-//             photo: None,
-//             style: ButtonStyle::Ghost,
-//             state: ButtonState::Default,
-//             size: Size::Medium,
-//             width_style: ButtonWidth::Expand,
-//             alignment: JustifyContent::Start,
-//             //tag
-//         }
-//     }
+    pub fn context(label: &str, icon: &str, on_press: fn()) -> Self {
+        Button {
+            label: label.to_string(),
+            icon: Some(icon.to_string()),
+            photo: None,
+            style: ButtonStyle::Ghost,
+            state: ButtonState::Default,
+            size: Size::Medium,
+            width_style: ButtonWidth::Expand,
+            alignment: JustifyContent::Start,
+            on_press: Callback(on_press)
+        }
+    }
 
-//     pub fn nav(label: String, icon: String, state: ButtonState) -> Self {
-//         Button {
-//             label,
-//             icon: Some(icon),
-//             photo: None,
-//             style: ButtonStyle::Ghost,
-//             state,
-//             size: Size::Large,
-//             width_style: ButtonWidth::Expand,
-//             alignment: JustifyContent::Start,
-//             // tag
-//         } 
-//     }
+    // pub fn nav(label: String, icon: String, state: ButtonState) -> Self {
+    //     Button {
+    //         label,
+    //         icon: Some(icon),
+    //         photo: None,
+    //         style: ButtonStyle::Ghost,
+    //         state,
+    //         size: Size::Large,
+    //         width_style: ButtonWidth::Expand,
+    //         alignment: JustifyContent::Start,
+    //         // tag
+    //     } 
+    // }
 
-//     pub fn nav_profile(name: &str, state: ButtonState) -> Self {
-//         Button {
-//             label: name.to_string(),
-//             icon: None,
-//             photo: Some("profile_picture".to_string()),
-//             style: ButtonStyle::Ghost,
-//             state,
-//             size: Size::Large,
-//             width_style: ButtonWidth::Expand,
-//             alignment: JustifyContent::Start,
-//            // tag
-//         } 
-//     }
+    // pub fn nav_profile(name: &str, state: ButtonState) -> Self {
+    //     Button {
+    //         label: name.to_string(),
+    //         icon: None,
+    //         photo: Some("profile_picture".to_string()),
+    //         style: ButtonStyle::Ghost,
+    //         state,
+    //         size: Size::Large,
+    //         width_style: ButtonWidth::Expand,
+    //         alignment: JustifyContent::Start,
+    //        // tag
+    //     } 
+    // }
 }
 

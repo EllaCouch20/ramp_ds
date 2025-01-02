@@ -32,7 +32,7 @@ impl Header {
 }
 
 impl Component for Header {
-    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, theme: &Res<Theme>) {
         let font = theme.fonts.style.heading.clone();
 
         let font_size = match self.size {
@@ -48,10 +48,10 @@ impl Component for Header {
             padding: UiRect::all(Val::Px(24.0)),
             ..default()
         }).with_children(|parent| {
-            IconButton(self.icon_left).spawn(parent, theme);
+            IconButton(self.icon_left).box_spawn(parent, theme);
             //pfp_button(parent, self.profile_photo);
-            NewText(self.title, font, font_size, theme.colors.text.heading).spawn(parent, theme);
-            IconButton(self.icon_right).spawn(parent, theme);
+            NewText(self.title, font, font_size, theme.colors.text.heading).box_spawn(parent, theme);
+            IconButton(self.icon_right).box_spawn(parent, theme);
         });
     }
 }

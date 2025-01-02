@@ -1,49 +1,32 @@
 use bevy::prelude::*;
 
-use crate::layout::utils::EXPAND;
-use crate::traits::{Component};
+use crate::traits::Component;
 
-use crate::theme::NavigateTo;
+// use crate::theme::NavigateTo;
 use crate::Theme;
 
-use crate::components::button::ButtonState;
-use crate::components::button::Button;
+// use crate::components::button::ButtonState;
+// use crate::components::button::Button;
 
-pub struct Tab {
-    pub name: String,
-    pub icon: String,
-    pub navigate_to: NavigateTo,
-    pub selected: bool,
-}
+// pub struct Tab {
+//     pub name: String,
+//     pub icon: String,
+//     pub navigate_to: NavigateTo,
+//     pub selected: bool,
+// }
 
 #[derive(Component)]
 pub struct Navigator {
     logo: Option<String>,
     profile: Option<String>,
-    tabs: Vec<Tab>,
+   //tabs: Vec<Tab>,
 }
 
-impl Navigator {
-    pub fn new(
-        logo: Option<String>,
-        profile: Option<String>,
-        tabs: Vec<Tab>,
-    ) -> Self {
-        Self {
-            logo,
-            profile,
-            tabs: tabs.into_iter().map(|mut tab| {
-                tab.selected = false;
-                tab
-            }).collect(),
-        }
-    }
-}
 
 impl Component for Navigator {
     //fn spawn_tab(self, _parent: &mut impl Parent, _theme: &Res<Theme>) {}
 
-    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
+    fn spawn(self: Box<Self>, _parent: &mut ChildBuilder, _theme: &Res<Theme>) {
         // parent.spawn(Node {
         //     width: Val::Px(300.0),
         //     height: EXPAND,
@@ -108,27 +91,27 @@ impl Component for Navigator {
 }
 
 
-#[derive(Component)]
-pub enum OnClick {
-    TabSelected(usize),
-}
+// #[derive(Component)]
+// pub enum OnClick {
+//     TabSelected(usize),
+// }
 
-fn handle_tab_selection(
-    mut query: Query<&mut Navigator>, 
-    mut interaction_query: Query<(&Interaction, &OnClick)>, 
-) {
-    for (interaction, click_event) in interaction_query.iter_mut() {
-        if *interaction == Interaction::Pressed {
-            if let OnClick::TabSelected(index) = click_event {
-                if let Ok(mut navigator) = query.get_single_mut() {
-                    for tab in navigator.tabs.iter_mut() {
-                        tab.selected = false;
-                    }
-                    if let Some(selected_tab) = navigator.tabs.get_mut(*index) {
-                        selected_tab.selected = true;
-                    }
-                }
-            }
-        }
-    }
-}
+// fn handle_tab_selection(
+//     mut query: Query<&mut Navigator>, 
+//     mut interaction_query: Query<(&Interaction, &OnClick)>, 
+// ) {
+//     for (interaction, click_event) in interaction_query.iter_mut() {
+//         if *interaction == Interaction::Pressed {
+//             if let OnClick::TabSelected(index) = click_event {
+//                 if let Ok(mut navigator) = query.get_single_mut() {
+//                     for tab in navigator.tabs.iter_mut() {
+//                         tab.selected = false;
+//                     }
+//                     if let Some(selected_tab) = navigator.tabs.get_mut(*index) {
+//                         selected_tab.selected = true;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }

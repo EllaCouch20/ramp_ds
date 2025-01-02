@@ -13,7 +13,7 @@ pub enum Size {
 pub struct NewText(pub String, pub Handle<Font>, pub f32, pub Color);
 
 impl Component for NewText {
-    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, theme: &Res<Theme>) {
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, _theme: &Res<Theme>) {
         parent.spawn((
             Text::new(&self.0),
             TextFont {

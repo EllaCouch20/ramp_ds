@@ -6,7 +6,7 @@ use crate::Theme;
 pub struct IconButton(pub Option<(ImageNode, NavigateTo)>);
 
 impl Component for IconButton {
-    fn spawn(self: Box<Self>, parent: &mut ChildBuilder<'_>, theme: &Res<Theme>) {
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder<'_>, _theme: &Res<Theme>) {
         let node = Node {
             height: Val::Px(32.0),
             width: Val::Px(32.0),

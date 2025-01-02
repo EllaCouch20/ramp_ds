@@ -1,22 +1,14 @@
 use bevy::prelude::*;
 
 use crate::Theme;
-use crate::theme::NavigateTo;
 
-use crate::traits::{Component};
+use crate::traits::Component;
 
 use super::utils::EXPAND;
 
 use super::header::Header;
 use super::content::Content;
 use super::bumper::Bumper;
-use super::navigator::Tab;
-use super::navigator::Navigator;
-
-const DESKTOP: bool = true;
-const MOBILE: bool = false;
-
-
 
 pub struct Interface {
     page: Page,
@@ -30,7 +22,7 @@ impl Interface {
 }
 
 impl Component for Interface {
-    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, theme: &Res<Theme>) {
         parent.spawn((
             Node {
                 width: EXPAND,
@@ -43,9 +35,8 @@ impl Component for Interface {
             Interaction::None,
             BackgroundColor(theme.colors.background.primary)
         )).with_children(|parent|{
-            self.page.spawn(parent, theme);
-            //if DESKTOP && self.navigator { nav_system.sidebar_navigator(parent, theme); }
-            //self.page.spawn_under(parent, theme);
+            self.page.box_spawn(parent, theme);
+            // Sidebar
         });
     }
 }
@@ -63,7 +54,7 @@ impl Page {
 }
 
 impl Component for Page {
-    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>){
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, theme: &Res<Theme>){
         parent.spawn(Node {
             width: EXPAND,
             height: EXPAND,
@@ -72,9 +63,9 @@ impl Component for Page {
             flex_direction: FlexDirection::Column,
             ..default()
         }).with_children(|parent| {
-            self.header.spawn(parent, theme);
-            self.content.spawn(parent, theme);
-            if let Some(bumper) = self.bumper {bumper.spawn(parent, theme);}
+            self.header.box_spawn(parent, theme);
+            self.content.box_spawn(parent, theme);
+            if let Some(bumper) = self.bumper {bumper.box_spawn(parent, theme);}
         });
     }
 }
