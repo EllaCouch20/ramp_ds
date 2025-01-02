@@ -1,13 +1,15 @@
 use bevy::prelude::*;
 
+use crate::traits::{Parent, Component};
+
 use crate::Theme;
 use crate::theme::NavigateTo;
 
-use crate::layout::utils::text;
+use crate::layout::utils::NewText;
 use crate::layout::utils::Size;
 use crate::layout::utils::EXPAND;
 
-use crate::components::icon_button::icon_button;
+use crate::components::icon_button::IconButton;
 
 pub struct Header {
     title: String,
@@ -27,7 +29,10 @@ impl Header {
     ) -> Self {
         Header {title: t.to_string(), size, icon_left, icon_right, profile_photo}
     }
-    pub fn spawn_under(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
+}
+
+impl Component for Header {
+    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
         let font = theme.fonts.style.heading.clone();
 
         let font_size = match self.size {
@@ -43,10 +48,10 @@ impl Header {
             padding: UiRect::all(Val::Px(24.0)),
             ..default()
         }).with_children(|parent| {
-            icon_button(parent, self.icon_left.clone());
+            IconButton(self.icon_left).spawn(parent, theme);
             //pfp_button(parent, self.profile_photo);
-            text(parent, &self.title, font, font_size, theme.colors.text.heading);
-            icon_button(parent, self.icon_right.clone());
+            NewText(self.title, font, font_size, theme.colors.text.heading).spawn(parent, theme);
+            IconButton(self.icon_right).spawn(parent, theme);
         });
     }
 }

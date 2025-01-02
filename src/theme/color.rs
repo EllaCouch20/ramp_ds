@@ -215,47 +215,19 @@ impl ButtonColors {
         let mut color_map = HashMap::new();
 
         color_map.insert((ButtonState::Default, ButtonStyle::Primary), schemes.primary_default);
-
         color_map.insert((ButtonState::Disabled, ButtonStyle::Primary), schemes.primary_disabled);
-
-        color_map.insert((ButtonState::Hover, ButtonStyle::Primary), schemes.primary_hover,
-        );
-
-        color_map.insert(
-            (ButtonState::Selected, ButtonStyle::Primary),
-            schemes.primary_selected,
-        );
+        color_map.insert((ButtonState::Hover, ButtonStyle::Primary), schemes.primary_hover);
+        color_map.insert((ButtonState::Selected, ButtonStyle::Primary), schemes.primary_selected);
 
         color_map.insert((ButtonState::Default, ButtonStyle::Secondary), schemes.secondary_default);
-
         color_map.insert((ButtonState::Disabled, ButtonStyle::Secondary), schemes.secondary_disabled);
-
         color_map.insert((ButtonState::Hover, ButtonStyle::Secondary), schemes.secondary_hover);
+        color_map.insert((ButtonState::Selected, ButtonStyle::Secondary), schemes.secondary_selected);
 
-        color_map.insert(
-            (ButtonState::Selected, ButtonStyle::Secondary),
-            schemes.secondary_selected,
-        );
-
-        color_map.insert(
-            (ButtonState::Default, ButtonStyle::Ghost),
-            schemes.ghost_default,
-        );
-
-        color_map.insert(
-            (ButtonState::Disabled, ButtonStyle::Ghost),
-            schemes.ghost_disabled,
-        );
-
-        color_map.insert(
-            (ButtonState::Hover, ButtonStyle::Ghost),
-            schemes.ghost_hover,
-        );
-
-        color_map.insert(
-            (ButtonState::Selected, ButtonStyle::Ghost),
-            schemes.ghost_selected,
-        );
+        color_map.insert((ButtonState::Default, ButtonStyle::Ghost), schemes.ghost_default);
+        color_map.insert((ButtonState::Disabled, ButtonStyle::Ghost), schemes.ghost_disabled);
+        color_map.insert((ButtonState::Hover, ButtonStyle::Ghost), schemes.ghost_hover);
+        color_map.insert((ButtonState::Selected, ButtonStyle::Ghost), schemes.ghost_selected);
 
         ButtonColors{ color_map }
     }

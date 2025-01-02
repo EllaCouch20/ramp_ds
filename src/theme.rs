@@ -4,7 +4,7 @@ pub mod color;
 mod icons;
 mod fonts;
 
-#[derive(Resource)]
+#[derive(Resource, Clone)]
 pub struct Theme {
     pub fonts: fonts::FontResources,
     pub colors: color::ColorResources,

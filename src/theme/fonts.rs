@@ -1,6 +1,7 @@
 #![allow(unused)]
 use bevy::prelude::*;
 
+#[derive(Clone)]
 pub struct FontResources {
     pub style: Style,
     pub size: FontSizes,
@@ -15,7 +16,7 @@ impl FontResources {
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Clone)]
 pub struct Style {
     pub heading: Handle<Font>,
     pub text: Handle<Font>,

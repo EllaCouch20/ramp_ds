@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use bevy::prelude::*;
 
+#[derive(Clone)]
 pub struct IconResources {
     pub icons: BTreeMap<String, Handle<Image>>
 }

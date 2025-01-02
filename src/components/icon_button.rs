@@ -1,18 +1,21 @@
 use bevy::prelude::*;
+use crate::traits::{Parent, Component};
 use crate::theme::NavigateTo;
+use crate::Theme;
 
-pub fn icon_button(
-    parent: &mut ChildBuilder,
-    icon_data: Option<(ImageNode, NavigateTo)>,
-){
-    let mut child = parent.spawn(Node {
-        height: Val::Px(32.0),
-        width: Val::Px(32.0),
-        ..default()
-    });
+pub struct IconButton(pub Option<(ImageNode, NavigateTo)>);
 
-    if let Some((icon, navigate_to)) = icon_data {
-        child.insert(navigate_to);
-        child.insert(icon);
+impl Component for IconButton {
+    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
+        let node = Node {
+            height: Val::Px(32.0),
+            width: Val::Px(32.0),
+            ..default()
+        };  
+        if let Some(bundle) = self.0 {
+            parent.spawn((node, bundle));
+        } else {
+            parent.spawn(node);
+        }
     }
 }

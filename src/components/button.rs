@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
-use crate::layout::utils::Size;
+use crate::traits::{Parent, Component};
+use crate::layout::utils::{Size, NewText};
 use crate::Theme;
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy, Component)]
@@ -24,7 +25,10 @@ pub enum ButtonWidth {
     Hug,
 }
 
-pub struct CustomButton{
+#[derive(Component)]
+pub struct Callback(fn());
+
+pub struct Button{
     label: String,
     icon: Option<String>,
     photo: Option<String>,
@@ -33,15 +37,11 @@ pub struct CustomButton{
     size: Size,
     width_style: ButtonWidth,
     alignment: JustifyContent,
+    on_press: Callback
 }
 
-impl CustomButton {
-    pub fn spawn_under<T: Bundle>(
-        &self,
-        parent: &mut ChildBuilder,
-        tag: T,
-        theme: &Res<Theme>
-    ) {
+impl Component for Button {
+    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
 
         let colors = theme.colors.button.colors_from(self.style, self.state);
 
@@ -58,14 +58,13 @@ impl CustomButton {
         };
 
         parent.spawn((
-            Button,
             Node {
                 flex_grow,
+                width: button_width,
                 height: Val::Px(height),
                 flex_basis: button_width,
-                width: button_width,
-                border: UiRect::all(Val::Px(1.0)),
                 justify_content: self.alignment,
+                border: UiRect::all(Val::Px(1.0)),
                 align_items: AlignItems::Center,
                 flex_direction: FlexDirection::Row,
                 padding: UiRect {
@@ -75,27 +74,25 @@ impl CustomButton {
                 },
                 ..default()
             },
-            BorderColor(colors.outline),
+            bevy::prelude::Button,
             BorderRadius::MAX,
+            BorderColor(colors.outline),
             BackgroundColor(colors.background),
             self.style,
             self.state,
-            tag,
-        )).with_children(|button| {
-
-            // === Spawn Icon === //
-
-            if let Some(icon) = &self.icon {
-                button.spawn((
-                    theme.icons.get(icon),
-                    Node {
-                        height: Val::Px(icon_size),
-                        width: Val::Px(icon_size),
-                        margin: UiRect::right(Val::Px(icon_pad)), 
-                        ..default()
-                    },
-                ));
-            }
+            self.on_press
+        )).with_children(|parent| {
+            // if let Some(icon) = &self.icon {
+            //     parent.spawn((
+            //         theme.icons.get(icon),
+            //         Node {
+            //             height: Val::Px(icon_size),
+            //             width: Val::Px(icon_size),
+            //             margin: UiRect::right(Val::Px(icon_pad)), 
+            //             ..default()
+            //         },
+            //     ));
+            // }
 
             // if let Some(photo) = self.photo.clone() {
             //     button.spawn(Node::default()).with_children(|parent| {
@@ -103,107 +100,99 @@ impl CustomButton {
             //     });
             // }
 
-            // === Spawn Label === //
-
-            button.spawn((
-                Text::new(self.label.clone()),
-                TextFont {
-                    font,
-                    font_size,
-                    ..default()
-                },
-                TextColor(colors.label),
-            ));     
+            NewText(self.label, font, font_size, colors.label).spawn(parent, &theme);
         });
-    }
+    } 
 }
 
-pub fn button_system(
-    theme: Res<Theme>,
-    mut interaction_query: Query<
-        (
-            &Interaction,
-            &mut BackgroundColor,
-            &mut BorderColor,
-            Option<&ButtonStyle>,
-            &ButtonState,
-        ),
-        (Changed<Interaction>, With<Button>),
-    >,
-) {
-    for (interaction, mut color, mut border_color, button_style, state) in &mut interaction_query {
-        if *state != ButtonState::Disabled && *state != ButtonState::Selected {
-            if let Some(button_style) = button_style {
-                match *interaction {
-                    Interaction::Hovered => {
-                        let colors = theme.colors.button.colors_from(*button_style, ButtonState::Hover);
-                        *color = colors.background.into();
-                        border_color.0 = colors.outline;
-                    }
-                    Interaction::None => {
-                        let colors = theme.colors.button.colors_from(*button_style, ButtonState::Default);
-                        *color = colors.background.into();
-                        border_color.0 = colors.outline;
-                    }
-                    Interaction::Pressed => {
-                        let colors = theme.colors.button.colors_from(*button_style, ButtonState::Selected);
-                        *color = colors.background.into();
-                        border_color.0 = colors.outline;
-                    }
-                }
+impl Button {
+    pub fn system(
+        theme: Res<Theme>,
+        mut interaction_query: Query<
+            (
+                &Interaction,
+                &mut BackgroundColor,
+                &mut BorderColor,
+                &ButtonStyle,
+                &ButtonState,
+                &Callback
+            ),
+            (Changed<Interaction>, With<bevy::prelude::Button>),
+        >,
+    ) {
+        for (interaction, mut background, mut border, style, state, callback) in &mut interaction_query {
+            if *state != ButtonState::Disabled {
+                (callback.0)();
+            }
+            if *state != ButtonState::Disabled && *state != ButtonState::Selected {
+    
+                let button_state = match interaction {
+                    Interaction::Pressed => ButtonState::Selected,
+                    Interaction::Hovered => ButtonState::Hover,
+                    Interaction::None => ButtonState::Default
+                };
+    
+                let colors = theme.colors.button.colors_from(*style, button_state);
+                *background = colors.background.into();
+                border.0 = colors.outline;
             }
         }
     }
-}
 
-pub fn secondary_default(label: &str, icon: &str) -> CustomButton {
-    CustomButton {
-        label: label.to_string(),
-        icon: Some(icon.to_string()),
-        photo: None,
-        style: ButtonStyle::Secondary,
-        state: ButtonState::Default,
-        size: Size::Medium,
-        width_style: ButtonWidth::Hug,
-        alignment: JustifyContent::Center,
+    pub fn secondary(label: &str, icon: &str, on_press: fn()) -> Self {
+        Button{
+            label: label.to_string(),
+            icon: Some(icon.to_string()),
+            photo: None,
+            style: ButtonStyle::Secondary,
+            state: ButtonState::Default,
+            size: Size::Medium,
+            width_style: ButtonWidth::Hug,
+            alignment: JustifyContent::Center,
+            on_press: Callback(on_press)
+        }
     }
+
+//     pub fn context(label: &str, icon: &str) -> Self {
+//         Button {
+//             label: label.to_string(),
+//             icon: Some(icon.to_string()),
+//             photo: None,
+//             style: ButtonStyle::Ghost,
+//             state: ButtonState::Default,
+//             size: Size::Medium,
+//             width_style: ButtonWidth::Expand,
+//             alignment: JustifyContent::Start,
+//             //tag
+//         }
+//     }
+
+//     pub fn nav(label: String, icon: String, state: ButtonState) -> Self {
+//         Button {
+//             label,
+//             icon: Some(icon),
+//             photo: None,
+//             style: ButtonStyle::Ghost,
+//             state,
+//             size: Size::Large,
+//             width_style: ButtonWidth::Expand,
+//             alignment: JustifyContent::Start,
+//             // tag
+//         } 
+//     }
+
+//     pub fn nav_profile(name: &str, state: ButtonState) -> Self {
+//         Button {
+//             label: name.to_string(),
+//             icon: None,
+//             photo: Some("profile_picture".to_string()),
+//             style: ButtonStyle::Ghost,
+//             state,
+//             size: Size::Large,
+//             width_style: ButtonWidth::Expand,
+//             alignment: JustifyContent::Start,
+//            // tag
+//         } 
+//     }
 }
 
-pub fn context_button(label: &str, icon: &str) -> CustomButton {
-    CustomButton {
-        label: label.to_string(),
-        icon: Some(icon.to_string()),
-        photo: None,
-        style: ButtonStyle::Ghost,
-        state: ButtonState::Default,
-        size: Size::Medium,
-        width_style: ButtonWidth::Expand,
-        alignment: JustifyContent::Start,
-    }
-}
-
-pub fn nav_button(label: String, icon: String, state: ButtonState) -> CustomButton {
-    CustomButton {
-        label,
-        icon: Some(icon),
-        photo: None,
-        style: ButtonStyle::Ghost,
-        state,
-        size: Size::Large,
-        width_style: ButtonWidth::Expand,
-        alignment: JustifyContent::Start,
-    } 
-}
-
-pub fn nav_profile(name: &str, state: ButtonState) -> CustomButton {
-    CustomButton {
-        label: name.to_string(),
-        icon: None,
-        photo: Some("profile_picture".to_string()),
-        style: ButtonStyle::Ghost,
-        state,
-        size: Size::Large,
-        width_style: ButtonWidth::Expand,
-        alignment: JustifyContent::Start,
-    } 
-}

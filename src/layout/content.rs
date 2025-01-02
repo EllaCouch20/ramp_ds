@@ -1,28 +1,15 @@
 use bevy::prelude::*;
 
-use bevy::prelude::*;
+use crate::traits::{Component, Parent};
+use crate::Theme;
 
 pub struct Content {
+    //pub children: Vec<Box<dyn Component>>,
     pub alignment: JustifyContent,
-    children: Vec<Box<dyn FnOnce(&mut ChildBuilder) + Send + Sync>>,
 }
 
-impl Content {
-    pub fn new(alignment: JustifyContent) -> Self {
-        Self {
-            alignment,
-            children: Vec::new(),
-        }
-    }
-
-    pub fn add_content<F>(&mut self, child: F)
-    where
-        F: FnOnce(&mut ChildBuilder) + 'static + Send + Sync,
-    {
-        self.children.push(Box::new(child));
-    }
-
-    pub fn spawn_under(&mut self, parent: &mut ChildBuilder) {
+impl Component for Content {
+    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
         parent.spawn(Node {
             justify_content: self.alignment,
             width: Val::Percent(100.0),
@@ -33,10 +20,19 @@ impl Content {
             row_gap: Val::Px(24.0),
             padding: UiRect::all(Val::Px(24.0)),
             ..default()
-        }).with_children(|builder| {
-            for child in self.children.drain(..) {
-                child(builder);
-            }
+        }).with_children(|parent|{
+            //for component in self.children {
+            //    component.spawn(parent, theme);
+            //}
         });
+    }
+}
+
+impl Content {
+    pub fn new(alignment: JustifyContent, children: &[impl Component]) -> Self {
+        Self {
+            alignment,
+            //children: children.to_vec(),
+        }
     }
 }

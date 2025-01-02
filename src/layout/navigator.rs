@@ -1,13 +1,13 @@
 use bevy::prelude::*;
 
 use crate::layout::utils::EXPAND;
+use crate::traits::{Component, Parent};
 
 use crate::theme::NavigateTo;
 use crate::Theme;
 
 use crate::components::button::ButtonState;
-use crate::components::button::nav_button;
-use crate::components::button::nav_profile;
+use crate::components::button::Button;
 
 pub struct Tab {
     pub name: String,
@@ -38,75 +38,72 @@ impl Navigator {
             }).collect(),
         }
     }
+}
 
-    pub fn tab_navigator(&self, _parent: &mut ChildBuilder, _theme: &Res<Theme>) {}
+impl Component for Navigator {
+    //fn spawn_tab(self, _parent: &mut impl Parent, _theme: &Res<Theme>) {}
 
-    pub fn sidebar_navigator(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
-        parent.spawn(Node {
-            width: Val::Px(300.0),
-            height: EXPAND,
-            align_items: AlignItems::Start,
-            justify_content: JustifyContent::Start,
-            ..default()
-        })
-        .with_children(|parent| {
-            parent.spawn(Node {
-                width: EXPAND,
-                height: EXPAND,
-                border: UiRect::right(Val::Px(1.0)),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                flex_direction: FlexDirection::Column,
-                row_gap: Val::Px(32.0),
-                padding: UiRect {
-                    top: Val::Px(32.0),
-                    bottom: Val::Px(32.0),
-                    left: Val::Px(16.0),
-                    right: Val::Px(16.0),
-                },
-                ..default()
-            })
-            .with_children(|parent| {
+    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
+        // parent.spawn(Node {
+        //     width: Val::Px(300.0),
+        //     height: EXPAND,
+        //     align_items: AlignItems::Start,
+        //     justify_content: JustifyContent::Start,
+        //     ..default()
+        // }).with_children(|parent| {
+        //     parent.spawn(Node {
+        //         width: EXPAND,
+        //         height: EXPAND,
+        //         border: UiRect::right(Val::Px(1.0)),
+        //         justify_content: JustifyContent::Center,
+        //         align_items: AlignItems::Center,
+        //         flex_direction: FlexDirection::Column,
+        //         row_gap: Val::Px(32.0),
+        //         padding: UiRect {
+        //             top: Val::Px(32.0),
+        //             bottom: Val::Px(32.0),
+        //             left: Val::Px(16.0),
+        //             right: Val::Px(16.0),
+        //         },
+        //         ..default()
+        //     }).with_children(|parent| {
 
-                if let Some(logo) = &self.logo {
-                    parent.spawn((
-                        theme.icons.get(logo),
-                        Node {
-                            width: Val::Px(90.0),
-                            ..default()
-                        },
-                    ));
-                }
+        //         if let Some(logo) = &self.logo {
+        //             parent.spawn((
+        //                 theme.icons.get(logo),
+        //                 Node {
+        //                     width: Val::Px(90.0),
+        //                     ..default()
+        //                 },
+        //             ));
+        //         }
 
-                parent.spawn(Node {
-                    width: EXPAND,
-                    align_items: AlignItems::Center,
-                    flex_direction: FlexDirection::Column,
-                    row_gap: Val::Px(8.0),
-                    ..default()
-                }).with_children(|parent| {
-                    for tab in self.tabs.iter(){
-                        let is_selected = tab.selected;
+        //         parent.spawn(Node {
+        //             width: EXPAND,
+        //             align_items: AlignItems::Center,
+        //             flex_direction: FlexDirection::Column,
+        //             row_gap: Val::Px(8.0),
+        //             ..default()
+        //         }).with_children(|parent| {
+        //             for tab in self.tabs.iter(){
+        //                 let state = if tab.selected {ButtonState::Selected} else {ButtonState::Default};
+        //                 // tab.navigate_to, 
+        //                 Button::nav(tab.name.clone(), tab.icon.clone(), state).spawn(parent, theme);
+        //             }
+        //         });
 
-                        if is_selected {
-                            nav_button(tab.name.clone(), tab.icon.clone(), ButtonState::Selected).spawn_under(parent, tab.navigate_to, theme);
-                        } else {
-                            nav_button(tab.name.clone(), tab.icon.clone(), ButtonState::Default).spawn_under(parent, tab.navigate_to, theme);
-                        }
-                    }
-                });
+        //         parent.spawn(Node {
+        //             width: EXPAND,
+        //             height: EXPAND,
+        //             ..default()
+        //         });
 
-                parent.spawn(Node {
-                    width: EXPAND,
-                    height: EXPAND,
-                    ..default()
-                });
-
-                if let Some(profile) = &self.profile {
-                    nav_profile(profile, ButtonState::Default).spawn_under(parent, NavigateTo::Profile, theme);
-                }
-            });
-        });
+        //         // if let Some(profile) = &self.profile {
+        //         //     let state = if tab.selected {ButtonState::Selected} else {ButtonState::Default};
+        //         //     Button::nav(NavigateTo::Profile, tab.name.clone(), tab.icon.clone(), state).spawn(parent, theme)
+        //         // }
+        //     });
+        // });
     }
 }
 
