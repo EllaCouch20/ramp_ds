@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::traits::{Component, Parent};
+use crate::traits::{Component};
 
 use crate::Theme;
 use crate::theme::NavigateTo;
@@ -10,7 +10,7 @@ use crate::components::button::Button;
 pub struct Bumper(Button, Option<Button>);
 
 impl Component for Bumper {
-    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
+    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
         parent.spawn(Node {
             width: EXPAND,
             justify_content: JustifyContent::Center,

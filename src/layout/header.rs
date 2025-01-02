@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::traits::{Parent, Component};
+use crate::traits::{Component};
 
 use crate::Theme;
 use crate::theme::NavigateTo;
@@ -32,7 +32,7 @@ impl Header {
 }
 
 impl Component for Header {
-    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
+    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
         let font = theme.fonts.style.heading.clone();
 
         let font_size = match self.size {

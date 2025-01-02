@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::Theme;
 use crate::theme::NavigateTo;
 
-use crate::traits::{Parent, Component};
+use crate::traits::{Component};
 
 use super::utils::EXPAND;
 
@@ -30,7 +30,7 @@ impl Interface {
 }
 
 impl Component for Interface {
-    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
+    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
         parent.spawn((
             Node {
                 width: EXPAND,
@@ -63,7 +63,7 @@ impl Page {
 }
 
 impl Component for Page {
-    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>){
+    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>){
         parent.spawn(Node {
             width: EXPAND,
             height: EXPAND,

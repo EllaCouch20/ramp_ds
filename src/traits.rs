@@ -1,23 +1,16 @@
 use bevy::prelude::*;
 use crate::Theme;
 
-
-pub trait Parent {
-    fn spawn<'c>(&'c mut self, bundle: impl Bundle) -> EntityCommands<'c> where Self: Sized;
-}
-
-impl Parent for Commands<'_, '_> {
-    fn spawn<'c>(&'c mut self, bundle: impl Bundle) -> EntityCommands<'c> where Self: Sized {
-        Commands::spawn(self, bundle)
-    }
-}
-
-impl Parent for ChildBuilder<'_> {
-    fn spawn<'c>(&'c mut self, bundle: impl Bundle) -> EntityCommands<'c> where Self: Sized {
-        ChildBuild::spawn(self, bundle)
-    }
-}
-
 pub trait Component {
-    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>);
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder<'_>, theme: &Res<Theme>);
+
+    fn box_spawn(self, parent: &mut ChildBuilder<'_>, theme: &Res<Theme>) where Self: Sized {
+        Box::new(self).spawn(parent, theme)
+    }
+}
+
+impl<T: Component> Component for Box<T> {
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder<'_>, theme: &Res<Theme>) {
+        (*self).spawn(parent, theme)
+    }
 }

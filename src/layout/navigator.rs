@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::layout::utils::EXPAND;
-use crate::traits::{Component, Parent};
+use crate::traits::{Component};
 
 use crate::theme::NavigateTo;
 use crate::Theme;
@@ -43,7 +43,7 @@ impl Navigator {
 impl Component for Navigator {
     //fn spawn_tab(self, _parent: &mut impl Parent, _theme: &Res<Theme>) {}
 
-    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
+    fn spawn(&self, parent: &mut ChildBuilder, theme: &Res<Theme>) {
         // parent.spawn(Node {
         //     width: Val::Px(300.0),
         //     height: EXPAND,

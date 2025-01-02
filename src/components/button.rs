@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::traits::{Parent, Component};
+use crate::traits::{Component};
 use crate::layout::utils::{Size, NewText};
 use crate::Theme;
 
@@ -25,7 +25,7 @@ pub enum ButtonWidth {
     Hug,
 }
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct Callback(fn());
 
 pub struct Button{
@@ -41,7 +41,7 @@ pub struct Button{
 }
 
 impl Component for Button {
-    fn spawn(self, parent: &mut impl Parent, theme: &Res<Theme>) {
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder<'_>, theme: &Res<Theme>) {
 
         let colors = theme.colors.button.colors_from(self.style, self.state);
 
@@ -80,7 +80,7 @@ impl Component for Button {
             BackgroundColor(colors.background),
             self.style,
             self.state,
-            self.on_press
+            self.on_press.clone()
         )).with_children(|parent| {
             // if let Some(icon) = &self.icon {
             //     parent.spawn((
@@ -88,7 +88,7 @@ impl Component for Button {
             //         Node {
             //             height: Val::Px(icon_size),
             //             width: Val::Px(icon_size),
-            //             margin: UiRect::right(Val::Px(icon_pad)), 
+            //             margin: UiRect::right(Val::Px(icon_pad)),
             //             ..default()
             //         },
             //     ));
@@ -100,7 +100,7 @@ impl Component for Button {
             //     });
             // }
 
-            NewText(self.label, font, font_size, colors.label).spawn(parent, &theme);
+            NewText(self.label, font, font_size, colors.label).box_spawn(parent, &theme);
         });
     } 
 }
