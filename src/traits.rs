@@ -8,9 +8,3 @@ pub trait Component {
         Box::new(self).spawn(parent, theme)
     }
 }
-
-impl<T: Component> Component for Box<T> {
-    fn spawn(self: Box<Self>, parent: &mut ChildBuilder<'_>, theme: &Res<Theme>) {
-        (*self).spawn(parent, theme)
-    }
-}

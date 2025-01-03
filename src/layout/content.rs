@@ -21,7 +21,7 @@ impl Component for Content {
             padding: UiRect::all(Val::Px(24.0)),
             ..default()
         }).with_children(|parent|{
-            self.children.into_iter().map(|component| {
+            self.children.into_iter().for_each(|component| {
                 component.spawn(parent, theme);
             });
         });
@@ -29,10 +29,10 @@ impl Component for Content {
 }
 
 impl Content {
-    pub fn new(alignment: JustifyContent, children: &[impl Component]) -> Self {
+    pub fn new(alignment: JustifyContent, children: Vec<Box<dyn Component>>) -> Self {
         Self {
             alignment,
-            children: children.into_iter().map(|c| Box::new(c) as Box<dyn Component>).collect(),
+            children,
         }
     }
 }
