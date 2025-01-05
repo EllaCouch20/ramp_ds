@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::traits::{Component};
-use crate::layout::utils::{Size, NewText};
+use crate::layout::utils::{Size, NewText, NewIcon, Padding};
 use crate::Theme;
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy, Component)]
@@ -19,15 +19,17 @@ pub enum ButtonStyle {
     Ghost,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum ButtonWidth {
     Expand,
     Hug,
 }
 
 #[derive(Component, Clone)]
-pub struct Callback(fn());
+pub struct Callback(pub fn() -> String);
 
+
+#[derive(Component, Clone)]
 pub struct Button{
     label: String,
     icon: Option<String>,
@@ -83,15 +85,8 @@ impl Component for Button {
             self.on_press.clone()
         )).with_children(|parent| {
             if let Some(icon) = &self.icon {
-                parent.spawn((
-                    theme.icons.get(icon),
-                    Node {
-                        height: Val::Px(icon_size),
-                        width: Val::Px(icon_size),
-                        margin: UiRect::right(Val::Px(icon_pad)),
-                        ..default()
-                    },
-                ));
+                NewIcon(icon.to_string(), icon_size).box_spawn(parent, &theme);
+                Padding(icon_pad).box_spawn(parent, &theme);
             }
 
             // if let Some(photo) = self.photo.clone() {
@@ -121,15 +116,14 @@ impl Button {
         >,
     ) {
         for (interaction, mut background, mut border, style, state, callback) in &mut interaction_query {
-            if *state != ButtonState::Disabled {
+            if *interaction == Interaction::Pressed && *state != ButtonState::Disabled {
                 (callback.0)();
             }
             if *state != ButtonState::Disabled && *state != ButtonState::Selected {
-    
                 let button_state = match interaction {
-                    Interaction::Pressed => ButtonState::Selected,
                     Interaction::Hovered => ButtonState::Hover,
-                    Interaction::None => ButtonState::Default
+                    Interaction::None => ButtonState::Default,
+                    Interaction::Pressed => ButtonState::Selected
                 };
     
                 let colors = theme.colors.button.colors_from(*style, button_state);
@@ -139,7 +133,7 @@ impl Button {
         }
     }
 
-    pub fn secondary(label: &str, icon: &str, on_press: fn()) -> Self {
+    pub fn secondary(label: &str, icon: &str, on_press: fn() -> String) -> Self {
         Button{
             label: label.to_string(),
             icon: Some(icon.to_string()),
@@ -153,7 +147,7 @@ impl Button {
         }
     }
 
-    pub fn context(label: &str, icon: &str, on_press: fn()) -> Self {
+    pub fn context(label: &str, icon: &str, on_press: fn() -> String) -> Self {
         Button {
             label: label.to_string(),
             icon: Some(icon.to_string()),

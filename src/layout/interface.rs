@@ -19,10 +19,8 @@ impl Interface {
     pub fn new(navigator: bool, page: Page) -> Self {
         Interface{navigator, page}
     }
-}
 
-impl Component for Interface {
-    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, theme: &Res<Theme>) {
+    pub fn spawn(self, parent: &mut Commands, theme: &Res<Theme>) -> Entity {
         parent.spawn((
             Node {
                 width: EXPAND,
@@ -37,9 +35,10 @@ impl Component for Interface {
         )).with_children(|parent|{
             self.page.box_spawn(parent, theme);
             // Sidebar
-        });
+        }).id()
     }
 }
+
 
 pub struct Page {
     header: Header,
@@ -54,7 +53,7 @@ impl Page {
 }
 
 impl Component for Page {
-    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, theme: &Res<Theme>){
+    fn spawn(self: Box<Self>, parent: &mut ChildBuilder, theme: &Res<Theme>) {
         parent.spawn(Node {
             width: EXPAND,
             height: EXPAND,
