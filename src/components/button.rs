@@ -1,7 +1,7 @@
 use bevy::prelude::*;
-
-use crate::traits::{Component};
-use crate::layout::utils::{Size, NewText, NewIcon, Padding};
+use std::sync::Arc;
+use crate::traits::Component;
+use crate::layout::utils::{Size, NewText, NewIcon, Padding, EXPAND};
 use crate::Theme;
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy, Component)]
@@ -26,8 +26,7 @@ pub enum ButtonWidth {
 }
 
 #[derive(Component, Clone)]
-pub struct Callback(pub fn() -> String);
-
+pub struct Callback(pub Arc<dyn Fn() + Send + Sync>);
 
 #[derive(Component, Clone)]
 pub struct Button{
@@ -133,8 +132,8 @@ impl Button {
         }
     }
 
-    pub fn secondary(label: &str, icon: &str, on_press: fn() -> String) -> Self {
-        Button{
+    pub fn secondary(label: &str, icon: &str, on_press: Arc<dyn Fn() + Send + Sync>) -> Self {
+        Button {
             label: label.to_string(),
             icon: Some(icon.to_string()),
             photo: None,
@@ -143,11 +142,11 @@ impl Button {
             size: Size::Medium,
             width_style: ButtonWidth::Hug,
             alignment: JustifyContent::Center,
-            on_press: Callback(on_press)
+            on_press: Callback(on_press),
         }
     }
 
-    pub fn context(label: &str, icon: &str, on_press: fn() -> String) -> Self {
+    pub fn context(label: &str, icon: &str, on_press: Arc<dyn Fn() + Send + Sync>) -> Self {
         Button {
             label: label.to_string(),
             icon: Some(icon.to_string()),
@@ -157,36 +156,7 @@ impl Button {
             size: Size::Medium,
             width_style: ButtonWidth::Expand,
             alignment: JustifyContent::Start,
-            on_press: Callback(on_press)
+            on_press: Callback(on_press),
         }
     }
-
-    // pub fn nav(label: String, icon: String, state: ButtonState) -> Self {
-    //     Button {
-    //         label,
-    //         icon: Some(icon),
-    //         photo: None,
-    //         style: ButtonStyle::Ghost,
-    //         state,
-    //         size: Size::Large,
-    //         width_style: ButtonWidth::Expand,
-    //         alignment: JustifyContent::Start,
-    //         // tag
-    //     } 
-    // }
-
-    // pub fn nav_profile(name: &str, state: ButtonState) -> Self {
-    //     Button {
-    //         label: name.to_string(),
-    //         icon: None,
-    //         photo: Some("profile_picture".to_string()),
-    //         style: ButtonStyle::Ghost,
-    //         state,
-    //         size: Size::Large,
-    //         width_style: ButtonWidth::Expand,
-    //         alignment: JustifyContent::Start,
-    //        // tag
-    //     } 
-    // }
 }
-

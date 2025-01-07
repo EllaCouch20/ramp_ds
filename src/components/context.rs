@@ -4,23 +4,26 @@ use bevy::input::mouse::MouseButton;
 
 use crate::layout::utils::Separator;
 use crate::Theme;
-
+use super::Button;
 use crate::traits::Component;
 
 #[derive(Component)]
 pub struct ContextMenu;
+#[derive(Resource)]
+pub struct ContextButtons(pub Option<Vec<Button>>);
 
 pub fn context_menu(
     mut commands: Commands,
     query_window: Query<&Window, With<PrimaryWindow>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
+    mut buttons: ResMut<ContextButtons>,
     mut context_menu_query: Query<(Entity, &Children), With<ContextMenu>>,
     theme: Res<Theme>,
 ) {
-    let window = query_window.single();
-    if let Some(cursor_position) = window.cursor_position() {
-        if mouse_button.just_pressed(MouseButton::Right) {
-            if let Some(context_menu) = &theme.context_menu {
+    if let Some(mut buttons) = buttons.0.clone() {
+        let window = query_window.single();
+        if let Some(cursor_position) = window.cursor_position() {
+            if mouse_button.just_pressed(MouseButton::Right) {
                 if context_menu_query.is_empty() {
                     commands.spawn((
                         Node {
@@ -38,7 +41,6 @@ pub fn context_menu(
                         BorderRadius::all(Val::Px(8.0)),
                         ContextMenu,
                     )).with_children(|parent| {
-                        let mut buttons = context_menu.clone();
                         let last = buttons.pop();
 
                         for button in buttons {
@@ -53,14 +55,14 @@ pub fn context_menu(
                     });
                 }
             }
-        }
-        
-        if mouse_button.just_pressed(MouseButton::Left) {
-            for (entity, children) in context_menu_query.iter_mut() {
-                for child in children.iter() {
-                    commands.entity(*child).despawn_recursive();
+            
+            if mouse_button.just_pressed(MouseButton::Left) {
+                for (entity, children) in context_menu_query.iter_mut() {
+                    for child in children.iter() {
+                        commands.entity(*child).despawn_recursive();
+                    }
+                    commands.entity(entity).despawn_recursive();
                 }
-                commands.entity(entity).despawn_recursive();
             }
         }
     }

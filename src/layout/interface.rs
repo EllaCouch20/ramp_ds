@@ -3,7 +3,8 @@ use bevy::prelude::*;
 use crate::Theme;
 
 use crate::traits::Component;
-
+use crate::components::context::ContextButtons;
+use crate::components::Button;
 use super::utils::EXPAND;
 
 use super::header::Header;
@@ -13,15 +14,17 @@ use super::bumper::Bumper;
 pub struct Interface {
     page: Page,
     navigator: bool,
+    context_menu: Option<Vec<Button>>,
 }
 
 impl Interface {
-    pub fn new(navigator: bool, page: Page) -> Self {
-        Interface{navigator, page}
+    pub fn new(navigator: bool, page: Page, context_menu: Option<Vec<Button>>) -> Self {
+        Interface{navigator, page, context_menu}
     }
 
-    pub fn spawn(self, parent: &mut Commands, theme: &Res<Theme>) -> Entity {
-        parent.spawn((
+    pub fn spawn(self, commands: &mut Commands, theme: &Res<Theme>) -> Entity {
+        commands.insert_resource(ContextButtons(self.context_menu));
+        commands.spawn((
             Node {
                 width: EXPAND,
                 height: EXPAND,
@@ -33,8 +36,8 @@ impl Interface {
             Interaction::None,
             BackgroundColor(theme.colors.background.primary)
         )).with_children(|parent|{
-            self.page.box_spawn(parent, theme);
             // Sidebar
+            self.page.box_spawn(parent, theme);
         }).id()
     }
 }
